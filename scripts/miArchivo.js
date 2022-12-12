@@ -5,6 +5,7 @@ function bienvenida(){
     let nombre = prompt("Por favor ingrese su nombre")
     alert(`bienvenido a mundo deportivo ${nombre}`)
 }
+
 bienvenida()
 
 /* utilizacion de constructor */
