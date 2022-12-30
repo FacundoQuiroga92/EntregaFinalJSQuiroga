@@ -1,0 +1,10 @@
+body{
+    background-image: linear-gradient(to bottom, #1585ec, #7d9eef, #b1b9f1, #d8d7f4, #f8f8f8);
+}
+.buscadorIndumentaria{
+    background-color: white;
+}
+
+.centrar{
+    text-align: center;
+}
