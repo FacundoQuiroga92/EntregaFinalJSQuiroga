@@ -34,7 +34,7 @@ const printInfo= formulario.addEventListener("submit", function(e){
     <div class="alert alert-primary" role=alert">
     <h5>Gracias ${nombreForm.value} por dejarnos tus datos, te contactaremos a ${correoForm.value} para solucionar tus dudas</h5>
     </div>
-    `
+    ` 
     const usuario = {
         nombre: `${nombre.value}`,
         correo: `${correo.value}`
@@ -46,45 +46,167 @@ const printInfo= formulario.addEventListener("submit", function(e){
 
 })
 
-//buscador de productos
-const productos = [
-    {id: 12, nombre: 'CAMISETA BOCA', importe: 30000},
-    {id: 11, nombre: 'CAMISETA RIVER', importe: 30000},
-    {id: 47, nombre: 'GORRA BOCA ', importe: 5000},
-    {id: 20, nombre: 'GORRA RACING', importe: 5000},
-    {id: 50, nombre: 'CAMISETA BRASIL', importe: 25000},
-    {id: 58, nombre: 'PELOTA MUNDIAL 2022', importe: 15000}]
 
-    const inputBusqueda = document.querySelector("#inputSearch")
-    const tablebody = document.querySelector("tbody")
+    //stock de productos
+    const productos = [
+        {id: 1, nombre: 'CAMISETA BOCA', importe: 30000, img:"./img/camiseta-de-boca.jpg",cantidad:1,},
+        {id: 2, nombre: 'CAMISETA RIVER', importe: 30000, img:"./img/camiseta-de-river.jpg",cantidad:1,},
+        {id: 3, nombre: 'GORRA BOCA ', importe: 5000, img:"./img/gorra-de-boca.jpg",cantidad:1,},
+        {id: 4, nombre: 'CAMISETA BRASIL', importe: 25000, img:"./img/camisetaBrasil.png",cantidad:1,},
+        {id: 5, nombre: 'CAMISETA ARGENTINA', importe: 25000, img:"./img/camisetaArgentina.jpg",cantidad:1,},
+        {id: 6, nombre: 'CAMISETA ESPAÑA', importe: 25000, img:"./img/camisetaEspaña.jpg",cantidad:1,},
+        {id: 7, nombre: 'PELOTA MUNDIAL 2022', importe: 15000, img:"./img/pelota.jpg",cantidad:1,}]
+    // inicio seccion carrito y eventos
+    const shopContent = document.querySelector("#carrito")
+    const verCarrito = document.querySelector(".ver-carrito")
+    const modalContainer = document.querySelector("#modal-container")
+    //bajada de json
+    let carrito= JSON.parse(localStorage.getItem("carrito")) || [];
     
-    
-    const armarTabla = (prod)=> {
-        return `<tr>
-                    <td>${prod.id}</td>
-                    <td>${prod.nombre}</td>
-                    <td>${prod.importe}</td>
-                </tr>`
-    }
-    
-    const filtrarProductos = ()=> {
-        let parametro = inputBusqueda.value.trim().toUpperCase()
-        let resultado = productos.filter(prod => prod.nombre.includes(parametro))
-            if (resultado.length > 0) {
-                subirProductos(resultado)
+ 
+    productos.forEach((prods)=>{
+
+        let content = document.createElement("div")
+        content.className = "card"
+        content.innerHTML =`
+        <img src=" ${prods.img}">
+        <h5>${prods.nombre}</h5>
+        <p class="price"> ${prods.importe} </p>
+        `;
+
+        shopContent.appendChild(content);
+
+        let comprar = document.createElement("button")
+        comprar.innerText = "agregar";
+        comprar.className = "agregar"
+
+        content.appendChild(comprar); 
+
+        comprar.addEventListener("click",()=>{
+
+            const repeat = carrito.some((repeatProduct)=> repeatProduct.id === prods.id)
+
+            if(repeat){
+                carrito.map((prod)=>{
+                    if(prod.id === prods.id){
+                        prod.cantidad++
+                    }
+                })
+            }else{
+                carrito.push({
+                    id : prods.id,
+                    img: prods.img,
+                    nombre: prods.nombre,
+                    importe: prods.importe,
+                    cantidad: prods.cantidad,
+                })
+                saveLocal()
             }
-    }
+        
+        } )
+    });
     
-    const subirProductos = (array)=> {
-        let tabla = ""
-        if (array.length > 0) {
-            array.forEach(prod => {
-                tabla += armarTabla(prod)
+        const pintarCarrito = ()=>{
+        limpiarHTML()
+        modalContainer.style.display="flex"
+        const modalHeader = document.createElement("div")
+        modalHeader.className = "modal-header"
+        modalHeader.innerHTML = `
+        <h2 class="modal-header-title">Carrito</h2>
+        `
+        modalContainer.appendChild(modalHeader)
+        const modalButton = document.createElement("button")
+        modalButton.innerText ="X"
+        modalButton.className="modal-header-button"
+
+        modalButton.addEventListener("click",()=>{
+            modalContainer.style.display="none"
+        })
+
+        modalHeader.appendChild(modalButton)
+
+        carrito.forEach((product) =>{
+            let carritoContent = document.createElement("div")
+            carrito.className = "modal-content"
+            carritoContent.innerHTML = `
+            <img src="${product.img}">
+            <h3>${product.nombre}</h3>
+            <p>${product.importe} $</p>
+            <span class="restar"> restar unidad- </span>
+            <p>Cantidad:${product.cantidad} </p>
+            <span class="sumar"> sumar unidad+ </span>
+            <p class="finish">Total de este Producto:${product.cantidad * product.importe} </p>
+            <button class="delete-product"> eliminar producto </button>
+            `
+
+            modalContainer.appendChild(carritoContent)
+
+            
+            // uso de sweet alert
+            let msjEliminarProducto = carritoContent.querySelector(".delete-product")
+            msjEliminarProducto.addEventListener("click", ()=>{
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Producto Eliminado',
+                    
+                  })
             })
-            tablebody.innerHTML = tabla
-        }
+
+            //boton restar productos y uso de sintaxis avanzada
+            let restar = carritoContent.querySelector(".restar")
+
+            restar.addEventListener("click", () => {
+                if(product.cantidad !==1){
+                    product.cantidad--
+                }
+                saveLocal()
+                pintarCarrito()
+            })
+            //boton sumar productos y uso de sintaxis avanzada
+            let sumar = carritoContent.querySelector(".sumar")
+            sumar.addEventListener("click", () => {
+                product.cantidad++
+                saveLocal()
+                pintarCarrito()
+            })
+
+            let eliminar = carritoContent.querySelector(".delete-product")
+            eliminar.addEventListener("click", ()=>{
+                eliminarProducto(product.id)
+            })
+        })
+        
+        
+
+        const total = carrito.reduce((acc, el) => acc + el.importe * el.cantidad, 0)
+        const totalBuying= document.createElement("div")
+        totalBuying.className="total-content"
+        totalBuying.innerHTML=`Finalizar compra Total de: ${total}$`
+        modalContainer.appendChild(totalBuying)
     }
-    subirProductos(productos)
+
+    function limpiarHTML() {
+        modalContainer.innerHTML = "";
+      }
     
-    inputBusqueda.addEventListener("search", filtrarProductos)
+    verCarrito.addEventListener("click", pintarCarrito)
+
+    //eliminar productos del carrito
+    const eliminarProducto = (id) =>{
+        const foundId = carrito.find((element)=> element.id === id)
+
+        carrito = carrito.filter((carritoId)=>{
+            return carritoId !== foundId
+        })
+
+        saveLocal()
+        pintarCarrito()
+    }
+
+    //local storage set item
+    function saveLocal(){
+        localStorage.setItem("carrito", JSON.stringify(carrito))
+    }
+
+    
     
