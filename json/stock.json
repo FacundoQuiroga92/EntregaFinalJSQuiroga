@@ -1,0 +1,8 @@
+[
+    {"id": 1, "nombre": "CAMISETA BOCA", "importe": 30000, "img":"./img/camiseta-de-boca.jpg","cantidad":1},
+    {"id": 2, "nombre": "CAMISETA RIVER", "importe": 30000, "img":"./img/camiseta-de-river.jpg","cantidad":1},
+    {"id": 3, "nombre": "GORRA BOCA", "importe": 5000, "img":"./img/gorra-de-boca.jpg","cantidad":1},
+    {"id": 4, "nombre": "CAMISETA BRASIL", "importe": 25000, "img":"./img/camisetaBrasil.png","cantidad":1},
+    {"id": 5, "nombre": "CAMISETA ARGENTINA", "importe": 25000, "img":"./img/camisetaArgentina.jpg","cantidad":1},
+    {"id": 6, "nombre": "CAMISETA ESPAÑA", "importe": 25000, "img":"./img/camisetaEspaña.jpg","cantidad":1},
+    {"id": 7, "nombre": "PELOTA MUNDIAL 2022", "importe": 15000, "img":"./img/pelota.jpg","cantidad":1}]

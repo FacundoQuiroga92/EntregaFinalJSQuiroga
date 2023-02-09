@@ -46,65 +46,62 @@ const printInfo= formulario.addEventListener("submit", function(e){
 
 })
 
-
-    //stock de productos
-    const productos = [
-        {id: 1, nombre: 'CAMISETA BOCA', importe: 30000, img:"./img/camiseta-de-boca.jpg",cantidad:1,},
-        {id: 2, nombre: 'CAMISETA RIVER', importe: 30000, img:"./img/camiseta-de-river.jpg",cantidad:1,},
-        {id: 3, nombre: 'GORRA BOCA ', importe: 5000, img:"./img/gorra-de-boca.jpg",cantidad:1,},
-        {id: 4, nombre: 'CAMISETA BRASIL', importe: 25000, img:"./img/camisetaBrasil.png",cantidad:1,},
-        {id: 5, nombre: 'CAMISETA ARGENTINA', importe: 25000, img:"./img/camisetaArgentina.jpg",cantidad:1,},
-        {id: 6, nombre: 'CAMISETA ESPAÑA', importe: 25000, img:"./img/camisetaEspaña.jpg",cantidad:1,},
-        {id: 7, nombre: 'PELOTA MUNDIAL 2022', importe: 15000, img:"./img/pelota.jpg",cantidad:1,}]
     // inicio seccion carrito y eventos
     const shopContent = document.querySelector("#carrito")
     const verCarrito = document.querySelector(".ver-carrito")
     const modalContainer = document.querySelector("#modal-container")
     //bajada de json
     let carrito= JSON.parse(localStorage.getItem("carrito")) || [];
-    
- 
-    productos.forEach((prods)=>{
-
-        let content = document.createElement("div")
-        content.className = "card"
-        content.innerHTML =`
-        <img src=" ${prods.img}">
-        <h5>${prods.nombre}</h5>
-        <p class="price"> ${prods.importe} </p>
-        `;
-
-        shopContent.appendChild(content);
-
-        let comprar = document.createElement("button")
-        comprar.innerText = "agregar";
-        comprar.className = "agregar"
-
-        content.appendChild(comprar); 
-
-        comprar.addEventListener("click",()=>{
-
-            const repeat = carrito.some((repeatProduct)=> repeatProduct.id === prods.id)
-
-            if(repeat){
-                carrito.map((prod)=>{
-                    if(prod.id === prods.id){
-                        prod.cantidad++
-                    }
-                })
-            }else{
-                carrito.push({
-                    id : prods.id,
-                    img: prods.img,
-                    nombre: prods.nombre,
-                    importe: prods.importe,
-                    cantidad: prods.cantidad,
-                })
-                saveLocal()
-            }
+    //fetch - async - await 
+    const getProducts = async () => {
+        const response =await fetch("./json/stock.json")
+        const data = await response.json()
         
-        } )
-    });
+
+        data.forEach((prods)=>{
+
+            let content = document.createElement("div")
+            content.className = "card"
+            content.innerHTML =`
+            <img src=" ${prods.img}">
+            <h5>${prods.nombre}</h5>
+            <p class="price"> ${prods.importe} </p>
+            `;
+    
+            shopContent.appendChild(content);
+    
+            let comprar = document.createElement("button")
+            comprar.innerText = "agregar";
+            comprar.className = "agregar"
+    
+            content.appendChild(comprar); 
+    
+            comprar.addEventListener("click",()=>{
+    
+                const repeat = carrito.some((repeatProduct)=> repeatProduct.id === prods.id)
+    
+                if(repeat){
+                    carrito.map((prod)=>{
+                        if(prod.id === prods.id){
+                            prod.cantidad++
+                        }
+                    })
+                }else{
+                    carrito.push({
+                        id : prods.id,
+                        img: prods.img,
+                        nombre: prods.nombre,
+                        importe: prods.importe,
+                        cantidad: prods.cantidad,
+                    })
+                    saveLocal()
+                }
+            
+            } )
+        });
+    }
+    getProducts()
+ 
     
         const pintarCarrito = ()=>{
         limpiarHTML()
@@ -183,6 +180,11 @@ const printInfo= formulario.addEventListener("submit", function(e){
         totalBuying.className="total-content"
         totalBuying.innerHTML=`Finalizar compra Total de: ${total}$`
         modalContainer.appendChild(totalBuying)
+
+        //se limpia el html al finalizar compra
+
+        let finish = document.querySelector(".total-content")
+        finish.addEventListener("click", limpiarHTML)
     }
 
     function limpiarHTML() {
